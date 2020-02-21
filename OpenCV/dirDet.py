@@ -9,99 +9,99 @@ face_cascade = cv2.CascadeClassifier(
 
 cap = cv2.VideoCapture(0)
 
-posicionesReferencia = []
-intervaloReferencia = 0
+#arreglo que almacena los vertices de los frames
 posiciones = []
+# variable que almacena la cantidad de frames 
+# leidos
 intervalo = 0
-xref = 0
-yref = 0
-href = 0
-wref = 0
 
 
-def deltax(ini, final):
-    xmin = 15
-    deltax = final[0]-ini[0]
-    if deltax > xmin:
-        return 'd'
-    else:
-        xmin = copy.copy(-xmin)
-        if deltax < xmin:
-            return 'i'
-        else:
-            return 'n'
+def getDelta(ini, final):
 
+    # el origen de coordenadas esta en la esquina
+    # superior izquierda
+    retorno = 'n'
 
-def promedio(arr):
-    ha = 0
-    wa = 0
-    xa = 0
-    ya = 0
-    for point in arr:
-        xa += point[0]
-        ya += point[1]
-        wa += point[2]
-        ha += point[3]
-    x = xa/len(arr)
-    y = ya/len(arr)
-    w = wa/len(arr)
-    h = ha/len(arr)
+    deltay = final[1]-ini[1]
+    deltax = (final[0]-ini[0])
+    # se determina cual delta fue mayor
+    # para establecer la prioridad del movimiento
+    if abs(deltax) > abs(deltay):
+        xmin = 30
+        if deltax > xmin:
+            retorno = 'd'
+        elif deltax < 0:
+                retorno ='i'
+    else:    
+        ymin = 30
+        if deltay > ymin:
+            retorno = 'b'
+        elif deltay < 0:
+                retorno = 'a'
 
-    return x, y, w, h
-
-
-def cercaRef(arr):
-  #  global xref
-   # global yref
-    margen = 3.1
-    if abs(xref-arr[0]) < margen or abs(yref-arr[1]) < margen:
-        return True
-    else:
-        return False
+    return retorno
 
 
 while(True):
 
     ret, frame = cap.read()
     cv2.flip(frame, 1, frame)
+    #se convierte la imagen a escala de grises para poder
+    #clasificarla
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(
-        gray, scaleFactor=1.5, minNeighbors=5)
+        gray, scaleFactor=1.15, minNeighbors=3)
 
     for(x, y, w, h) in faces:
-        roi_gray = gray[y:y+h, x:x+w]
-        roi_color = frame[y:y+h, x:x+w]
-        #img_item = 'my-image'+str(intervalo)+'.png'
 
-        # cv2.imwrite(img_item,roi_gray)
-        color = (255, 0, 0)
-        stroke = 2
-        cv2.rectangle(frame, (x, y), (x+w, y+h), color, stroke)
-        if intervaloReferencia < 20:
-            intervaloReferencia += 1
-            posicionesReferencia.append((x, y, w, h))
-        if intervaloReferencia == 20:
-            xref, yref, wref, href = promedio(posicionesReferencia)
-            intervaloReferencia += 1
-        else:
-            posiciones.append((x, y))
-            intervalo += 1
-            if intervalo > 2:
-                # cercaRef(posiciones[len(posiciones)-1])
-                # if cercaRef(posiciones[len(posiciones)-1]):
-                intervalo = copy.copy(0)
-                #posiciones[len(posiciones)-2], posiciones[len(posiciones)-1]
-                dx = deltax(posiciones[len(posiciones)-2],
-                            posiciones[len(posiciones)-1])
-                posiciones = copy.deepcopy([])
-                if dx == 'd':
-                    print("DERECHA!")
-                elif dx == 'i':
-                    print("IZQUIERDA!")
-                elif dx == 'n':
-                    def clear(): return os.system('cls')
-                    clear()
+        # se dibuja el el cuadrado donde esta la cara        
+        #color = (255, 0, 0)
+        #stroke = 2
+        #cv2.rectangle(frame, (x, y), (x+w, y+h), color, stroke)
+        
+        # se dibujan los vertices que detectan la cara
+
+        # punto inferior derecho
+        infd = "x:{}".format(x+w) + "y:{}".format(y+h)
+        cv2.putText(frame, infd, (x+w, y+h),1,1.5,(0,0,255),2)
+        # punto inferior izquierdo
+        infi = "x:{}".format(x) + "y:{}".format(y+h)
+        cv2.putText(frame, infi, (x, y+h),1,1.5,(0,0,255),2)
+        # punto superior derecho
+        supd = "x:{}".format(x+w) + "y:{}".format(y)
+        cv2.putText(frame, supd, (x+w, y),1,1.5,(0,0,255),2)
+        # punto superior izquierdo
+        supi = "x:{}".format(x) + "y:{}".format(y)
+        cv2.putText(frame, supi, (x, y),1,1.5,(0,0,255),2)
+
+        #se agrega el punto al arreglo de vertices
+        posiciones.append((x, y))
+        
+        # variable que representa la cantidad de frames
+        # almacenados
+        intervalo += 1
+        
+        if intervalo > 13:
+            #se resetea la cantidad de frames
+            intervalo = copy.copy(0)
+            #se analizan los movimientos
+            delta = getDelta(posiciones[0],
+                             posiciones[len(posiciones)-1])
+            #se resetea el arreglo
+            posiciones = copy.deepcopy([])
+            if delta == 'd':
+                print("DERECHA!")
+            elif delta == 'i':
+                print("IZQUIERDA!")
+            elif delta == 'a':
+                print("ARRIBA!")
+            elif delta == 'b':
+                print("ABAJO!")
+            elif delta == 'n':
+                def clear(): return os.system('cls')
+                clear()
     cv2.imshow('test', frame)
+    
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
 
