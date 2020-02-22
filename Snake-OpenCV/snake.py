@@ -19,8 +19,8 @@ def toVec4(x,y):
 
 
 def foodLocation(width,height):
-    x = random.randint(2,width-2)
-    y = random.randint (2,height-2)
+    x = random.randint(5,width-5)
+    y = random.randint (5,height-5)
     #print(x,y)
     return toVec4(x,y)
 
@@ -75,6 +75,7 @@ class Snake:
             self.body.append(toVec4(random.randint(0,width),random.randint(0,height)))
             self.xspeed = 0
             self.yspeed = 0
+            self.len = 1
         
     def getCoord(self):
         return self.body
@@ -101,8 +102,25 @@ class Snake:
                 retorno = True
         return retorno
     
+    def getLen(self):
+        return self.len
+    
     def grow(self):
         # se copia el ultimo elemento del arreglo y se incerta
         #nuevamente al final
         head = self.body[len(self.body)-1]
         self.body.append(head)
+        self.len+=1
+    
+    def currDir(self):
+        retorno = ''
+        if self.xspeed == 1:
+            retorno = 'd'
+        elif self.xspeed == -1:
+            retorno = 'i'
+        elif self.yspeed == 1:
+            retorno = 'b'
+        elif self.xspeed == -1:
+            retorno = 'a'   
+        return retorno
+             

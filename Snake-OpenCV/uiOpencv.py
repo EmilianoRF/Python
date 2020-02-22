@@ -13,26 +13,27 @@ class Ui_MainWindow(object):
     
     def __init__(self):
     # dimensiones del widget de opengl
-        self.windowWidth = 400
-        self.windowHeight = 400
+        self.windowWidth = 600
+        self.windowHeight = 600
         
         self.graficador = render.Render(self.windowWidth,self.windowHeight)
         
         #self.face_cascade = cv2.CascadeClassifier('cascades/data/haarcascade_frontalface_alt2.xml')
         #self.cap = cv2.VideoCapture(0)
         self.thread = OpenCVThread()
+        #self.MainWindow.setWindowTitle('Test PyQT-OpenCV')
 
     
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(911, 694)
+        MainWindow.setObjectName('Test PyQT-OpenCV')
+        MainWindow.resize(1200, 650)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.WindowOpenGL = QtWidgets.QOpenGLWidget(self.centralwidget)
-        self.WindowOpenGL.setGeometry(QtCore.QRect(20, 70,self.windowWidth,self.windowHeight))
+        self.WindowOpenGL.setGeometry(QtCore.QRect(20, 20,self.windowWidth,self.windowHeight))
         self.WindowOpenGL.setObjectName("WindowOpenGL")
         self.WindowOpenCV = QtWidgets.QLabel(self.centralwidget)
-        self.WindowOpenCV.setGeometry(QtCore.QRect(450, 70, 400, 400))
+        self.WindowOpenCV.setGeometry(QtCore.QRect(640, 20, 540, 600))
         self.WindowOpenCV.setObjectName("WindowOpenCV")
         self.WindowOpenCV.setScaledContents(True)
 
@@ -44,6 +45,7 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        
 
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -51,6 +53,7 @@ class Ui_MainWindow(object):
         
         #se genera un nuevo hilo para la lectura del video de la camara
         self.thread.image.connect(self.updateLabel)
+        self.thread.mover.connect(self.graficador.move)
         self.thread.start()
         
     def retranslateUi(self, MainWindow):
@@ -66,7 +69,7 @@ class Ui_MainWindow(object):
         # se setea la tasa de refresco de la pantalla
         timer = QTimer(self.centralwidget)
         timer.timeout.connect(self.WindowOpenGL.update) 
-        timer.start(100)
+        timer.start(250)
     #se actualiza el label con la imagen tomada de la camara   
     def updateLabel(self, image):
         self.WindowOpenCV.setPixmap(image)
@@ -76,6 +79,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
+    MainWindow.setWindowTitle('test')
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()

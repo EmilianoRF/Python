@@ -15,7 +15,7 @@ class Render:
         self.windowWidth = winW
         self.windowHeight = winH
         # factor de escala para la resolucion interna
-        self.scale = 20
+        self.scale = 30
         # dimensiones internas
         self.w = round(self.windowWidth/self.scale)
         self.h = round(self.windowHeight/self.scale)
@@ -46,7 +46,7 @@ class Render:
     def draw(self):
         
         # lectura de las entradas del teclado
-        self.keyEvent()
+        #self.keyEvent()
 
         # se actualizan las coordenadas de los cuadrados
         self.s.update(self.w,self.h)
@@ -81,7 +81,7 @@ class Render:
             glVertex2f(cord.x_der,cord.y_sup)
             glVertex2f(cord.x_iz,cord.y_sup)
             glEnd()
-
+    '''
     # manejo de las flechas del teclado para controlar la direccion
     def keyEvent(self):
         if keyboard.is_pressed('up'):
@@ -92,4 +92,26 @@ class Render:
             self.s.setSpeed(-1,0)
         elif keyboard.is_pressed('down'):
             self.s.setSpeed(0,-1)
-    
+    '''
+    def move(self,x,y):
+        if self.s.getLen() == 1:
+            self.s.setSpeed(x,y)
+        else:
+            estado = self.s.currDir()
+            nexdir = ''
+            if x == 1:
+                nexdir = 'd'
+            elif x == -1:
+                nexdir = 'i'
+            elif y == 1:
+                    nexdir = 'b'
+            elif y == -1:
+                nexdir = 'a'
+            
+            if((estado == 'a' and nexdir == 'b')
+            or (estado == 'b' and nexdir == 'a') 
+            or (estado == 'd' and nexdir == 'i') 
+            or (estado == 'i' and nexdir == 'd')):
+                pass
+            else:
+                self.s.setSpeed(x,y)
