@@ -1,0 +1,4 @@
+defaultXmin : 5
+defaultYmin : 7
+defaultFrames : 1
+defaultGLtimer : 200
