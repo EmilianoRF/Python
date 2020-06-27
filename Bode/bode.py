@@ -52,7 +52,6 @@ plt.semilogx(f,l3,linestyle=linea)
 # Parametros de los ejes
 
 plt.legend(['A(jw)','R2/R1','sT1','1/(sT2+1)','1/(sT1+1)'],loc='best')
-plt.grid(False)
 plt.xlabel("Frecuencia [Hz]")
 plt.ylabel("Amplitud [db]")
 plt.ylim(-80,60)
@@ -112,7 +111,7 @@ plt.figure()
 # Valores de frecuencias usados
 frecuencias=np.array([150,1500,4875,8250,11625,15000,150000])
 
-# Amplitudes medidas
+# Amplitudes medidas (ya convertidas a db)
 amplitudes=np.array([12,31,33,32,31,29,10])
 
 # Se grafica la curva teórica
